@@ -1,0 +1,76 @@
+/* --- General Body and Background --- */
+/* This sets the background of the entire page to black and the default text color to white. */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #000000;
+  color: white;
+}
+
+/* --- Main Layout Container --- */
+/* This sets up the main layout to have the content in the middle and the image galleries on the sides. */
+.App {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+/* --- Main Centered Content --- */
+/* This targets the main content area, making sure it's perfectly centered on the page. */
+.main-content {
+  text-align: center;
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* --- Larger Heading --- */
+/* This specifically targets the <h1> tag in your app and makes it much larger. */
+.App-header h1 {
+  font-size: 4rem; /* You can make this number bigger or smaller */
+  margin-bottom: 10px;
+}
+
+/* --- Welcome Message Style --- */
+.welcome-message {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* --- Longer Description Style --- */
+/* This styles your new three-sentence description, limiting its width so it's easy to read. */
+.description {
+  max-width: 600px;
+  margin: 0 auto; /* This also helps with centering */
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* --- Logo and Side Images --- */
+.logo {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+}
+
+.side-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+}
+
+.side-gallery img {
+  width: 150px;
+  height: auto;
+  border-radius: 8px;
+}
