@@ -234,5 +234,4 @@ function App() {
   );
 }
 
-// THIS IS THE ONLY EXPORT. THE DUPLICATE IS NOW GONE.
 export default App;
