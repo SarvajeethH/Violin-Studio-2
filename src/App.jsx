@@ -1,18 +1,17 @@
 import React, { useState, useRef } from 'react';
 
 // --- MOCK DATABASE & AI SIMULATION ---
-// In a real application, this data would come from a server after a web search.
 const pieceDatabase = {
   "bach partita no 2 in d minor": {
     title: "Partita No. 2 in D minor, BWV 1004",
     description: "Composed by Johann Sebastian Bach between 1717 and 1723, this partita is one of the cornerstones of the solo violin repertoire. It is famous for its final movement, the monumental 'Chaconne,' which is a masterwork of emotional depth and technical complexity, featuring a continuous set of variations on a theme.",
-    usualTempo: 76, // For the Allemande movement
+    usualTempo: 76,
     practiceTempo: 60,
   },
   "mendelssohn violin concerto in e minor": {
     title: "Violin Concerto in E minor, Op. 64",
     description: "Felix Mendelssohn's final large-scale orchestral work, this concerto is a staple of the Romantic era. It is known for its innovative structure, such as linking all three movements without a pause, and its soaring, lyrical melodies that demand both technical virtuosity and deep musical sensitivity from the soloist.",
-    usualTempo: 120, // For the first movement
+    usualTempo: 120,
     practiceTempo: 90,
   },
   "introduction and rondo capriccioso": {
@@ -23,7 +22,6 @@ const pieceDatabase = {
   }
 };
 
-// Mock AI audio analysis
 const getMockAIAnalysis = () => {
   return new Promise(resolve => {
     setTimeout(() => {
@@ -37,42 +35,30 @@ const getMockAIAnalysis = () => {
   });
 };
 
-// Helper function to format time
 const formatTime = (time) => {
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time % 60);
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-
 function App() {
-  // UI State
   const [showQuestions, setShowQuestions] = useState(false);
   const questionsRef = useRef(null);
-  
-  // Input State
   const [pieceName, setPieceName] = useState('');
   const [userTempo, setUserTempo] = useState('');
-
-  // Recorder State
   const [permission, setPermission] = useState(false);
   const [stream, setStream] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioURL, setAudioURL] = useState('');
-  
-  // Analysis State
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [pieceInfo, setPieceInfo] = useState(null);
   const [aiFeedback, setAiFeedback] = useState([]);
-
-  // Technical Refs
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerIntervalRef = useRef(null);
 
   const getMicrophonePermission = async () => {
-    // (This function remains unchanged from the previous version)
     if ("MediaRecorder" in window) {
       try {
         const streamData = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -83,7 +69,6 @@ function App() {
   };
   
   const handleRecordClick = () => {
-    // (This function remains unchanged from the previous version)
     if (!permission) { getMicrophonePermission(); return; }
     if (isRecording) {
       mediaRecorderRef.current.stop();
@@ -113,21 +98,15 @@ function App() {
 
   const analyzeRecording = async () => {
     setIsAnalyzing(true);
-    
-    // --- NEW: Look up piece info from our mock database ---
     const normalizedPieceName = pieceName.trim().toLowerCase();
     const info = pieceDatabase[normalizedPieceName] || null;
     setPieceInfo(info);
-
-    // Run the mock audio analysis
     const feedback = await getMockAIAnalysis();
     setAiFeedback(feedback);
-
     setIsAnalyzing(false);
   };
   
   const handleStartAnalysis = () => {
-    // (This function remains unchanged)
     setShowQuestions(true);
     setTimeout(() => questionsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
@@ -135,7 +114,25 @@ function App() {
   return (
     <div className="App-container">
       <div className="App">
-          {/* ... side galleries and main header content are unchanged ... */}
+        <div className="side-gallery left">
+          <img src="/violin1.jpg" alt="Violin" />
+          <img src="/violin2.jpg" alt="Violin" />
+        </div>
+        <main className="main-content">
+          <header className="App-header">
+            <h1>Violin Studio</h1>
+            <p className="description">
+              This application is designed to help you grow as a musician by providing cutting-edge tools to refine your sound. Our AI-powered features analyze your playing and offer feedback to enhance your acoustic quality. Take your violin skills to the next level and unlock your true potential.
+            </p>
+            <button className="cta-button" onClick={handleStartAnalysis}>
+              Start Your Analysis
+            </button>
+          </header>
+        </main>
+        <div className="side-gallery right">
+          <img src="/violin3.jpg" alt="Violin" />
+          <img src="/violin4.jpg" alt="Violin" />
+        </div>
       </div>
       
       {showQuestions && (
@@ -152,10 +149,31 @@ function App() {
             </div>
             
             <div className="audio-recorder-section">
-                {/* ... The sophisticated recorder UI is unchanged ... */}
+                <div className="recorder-ui">
+                  <div className="timer">{formatTime(recordingTime)}</div>
+                  <button 
+                    className={`record-stop-button ${isRecording ? 'recording' : ''}`}
+                    onClick={handleRecordClick}
+                    aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+                  >
+                    <div className="record-icon"></div>
+                  </button>
+                  <div className="recording-status">
+                    {isRecording ? "Recording in progress..." : "Ready to record"}
+                  </div>
+                </div>
+
+                {audioURL && (
+                  <div className="audio-result">
+                    <h4>Your Recording:</h4>
+                    <audio src={audioURL} controls className="audio-player" />
+                    <button className="cta-button analyze-button" onClick={analyzeRecording} disabled={isAnalyzing}>
+                      Analyze My Recording
+                    </button>
+                  </div>
+                )}
             </div>
 
-            {/* --- COMPLETELY REVAMPED FEEDBACK SECTION --- */}
             {isAnalyzing && (
               <div className="analysis-indicator">
                 <div className="spinner"></div>
@@ -165,7 +183,6 @@ function App() {
 
             {(pieceInfo || aiFeedback.length > 0) && !isAnalyzing && (
               <div className="results-container">
-                {/* --- NEW PIECE INFO SECTION --- */}
                 {pieceInfo && (
                   <div className="piece-info-section">
                     <h3>About: {pieceInfo.title}</h3>
@@ -196,7 +213,6 @@ function App() {
                   </div>
                 )}
                 
-                {/* --- EXISTING AUDIO FEEDBACK SECTION --- */}
                 {aiFeedback.length > 0 && (
                   <div className="performance-feedback-section">
                     <h3>Your Performance Analysis</h3>
@@ -218,4 +234,5 @@ function App() {
   );
 }
 
+// THIS IS THE ONLY EXPORT. THE DUPLICATE IS NOW GONE.
 export default App;
