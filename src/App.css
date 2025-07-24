@@ -1,4 +1,4 @@
-/* --- General Body and Background --- */
+/* --- General Body and Font --- */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -6,17 +6,18 @@ body {
   color: white;
 }
 
-/* --- Main Layout Container --- */
+/* --- Main Layout Containers --- */
+.App-container {
+  /* This parent allows for the scrolling content to exist below the main view */
+}
+
 .App {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   min-height: 100vh;
-  /* We need to allow the parent to scroll for the new section */
-  position: relative; 
 }
 
-/* --- Main Centered Content --- */
 .main-content {
   text-align: center;
   flex-grow: 1;
@@ -28,6 +29,7 @@ body {
   min-height: 100vh;
 }
 
+/* --- Initial Header and Text Content --- */
 .App-header h1 {
   font-size: 4rem;
   margin-bottom: 10px;
@@ -51,6 +53,7 @@ body {
   flex-direction: column;
   gap: 10px;
   padding: 20px;
+  flex-shrink: 0;
 }
 
 .side-gallery img {
@@ -60,7 +63,7 @@ body {
   opacity: 0.7;
 }
 
-/* --- Call to Action Button --- */
+/* --- Buttons and Interactive Elements --- */
 .cta-button {
   background-color: #ffffff;
   color: #000000;
@@ -71,7 +74,7 @@ body {
   font-weight: bold;
   cursor: pointer;
   margin-top: 30px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .cta-button:hover {
@@ -79,28 +82,41 @@ body {
   transform: scale(1.05);
 }
 
-/* --- Questions Section --- */
-.questions-area-container {
-  /* This container makes the scroll down feature work */
+.cta-button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  transform: none;
+  color: #999;
+}
+
+/* --- Container for All Sections Below the Fold --- */
+.interactive-container {
   width: 100%;
   display: flex;
-  justify-content: center;
-  padding: 100px 20px; /* Add padding for spacing */
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
   background-color: #000;
 }
 
-.questions-area {
+.questions-area, .piece-info-section, .audio-recorder-section, .performance-feedback-section, .analysis-indicator {
   max-width: 800px;
   width: 100%;
-  text-align: left;
-  color: #f0f0f0;
+  box-sizing: border-box;
+  margin-top: 50px;
+}
+/* Remove margin for the very first element */
+.interactive-container > *:first-child {
+  margin-top: 0;
 }
 
+
+/* --- Question and Input Styles --- */
 .questions-area h2 {
   font-size: 2.5rem;
   text-align: center;
   margin-bottom: 40px;
-  border-bottom: 2px solid #555;
+  border-bottom: 2px solid #333;
   padding-bottom: 10px;
 }
 
@@ -116,7 +132,7 @@ body {
 
 .question-input {
   width: 100%;
-  box-sizing: border-box; /* Important for padding and width */
+  box-sizing: border-box;
   padding: 12px;
   background-color: #1a1a1a;
   border: 1px solid #444;
@@ -125,172 +141,38 @@ body {
   font-size: 1rem;
 }
 
-/* ADD THESE NEW STYLES TO THE END OF YOUR App.css FILE */
-
-/* --- Container for All Analysis Results --- */
-.results-container {
-  margin-top: 50px;
-}
-
-/* --- New Piece Info Section --- */
+/* --- Piece Info & Tempo Styles --- */
 .piece-info-section {
   background-color: #111;
   padding: 25px;
   border-radius: 15px;
   border: 1px solid #2a2a2a;
-  margin-bottom: 40px;
 }
-
-.piece-info-section h3 {
-  margin-top: 0;
-  font-size: 1.8rem;
-  border-bottom: 1px solid #333;
-  padding-bottom: 10px;
-}
-
-.piece-info-section h4 {
-  font-size: 1.4rem;
-  color: #ccc;
-  margin-top: 30px;
-}
-
-.piece-info-description {
-  line-height: 1.7;
-  color: #ddd;
-}
-
-/* --- New Tempo Analysis Boxes --- */
-.tempo-analysis {
-  display: flex;
-  justify-content: space-around;
-  gap: 15px;
-  margin-top: 15px;
-}
-
-.tempo-box {
-  background-color: #2a2a2a;
-  flex-grow: 1;
-  text-align: center;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid #444;
-}
-
-.tempo-box span {
-  font-size: 0.9rem;
-  color: #aaa;
-  text-transform: uppercase;
-}
-
-.tempo-value {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #fff;
-  margin-top: 5px;
-}
-
-.tempo-comment {
-  text-align: center;
-  font-style: italic;
-  color: #999;
-  margin-top: 20px;
-}
+.piece-info-section h3 { font-size: 1.8rem; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+.piece-info-description { line-height: 1.7; color: #ddd; }
+.tempo-analysis { display: flex; justify-content: space-around; gap: 15px; margin: 25px 0; }
+.tempo-box { background-color: #2a2a2a; flex-grow: 1; text-align: center; padding: 20px; border-radius: 10px; }
+.tempo-box span { font-size: 0.9rem; color: #aaa; text-transform: uppercase; }
+.tempo-value { font-size: 2.5rem; font-weight: bold; color: #fff; margin-top: 5px; }
 
 
-/* --- Renamed Performance Feedback Section --- */
-.performance-feedback-section {
-  margin-top: 40px;
-}
+/* --- Recorder & Volume Meter Styles --- */
+.audio-recorder-section h3 { font-size: 1.8rem; }
+.recorder-widget { display: flex; align-items: center; gap: 20px; background-color: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #2a2a2a; }
+.record-button-new { width: 60px; height: 60px; border-radius: 50%; background-color: #c82333; border: 3px solid #ff7b7b; cursor: pointer; transition: all 0.2s ease-in-out; flex-shrink: 0; }
+.record-button-new.recording { border-radius: 10px; background-color: #e0e0e0; border-color: #ffffff; }
+.volume-meter { width: 100%; height: 20px; background-color: #333; border-radius: 10px; overflow: hidden; }
+.volume-level { height: 100%; background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336); border-radius: 10px; transition: width 0.1s linear; }
+.timer { font-size: 1.5rem; color: #aaa; margin-top: 10px; text-align: center; }
+.audio-result { margin-top: 30px; }
+.audio-player { width: 100%; margin: 10px 0; }
+.analyze-button { display: block; margin: 20px auto 0 auto; }
 
-.performance-feedback-section h3 {
-  font-size: 1.8rem;
-}
 
-.feedback-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
-}
-
-.feedback-list li {
-  background-color: #1a1a1a;
-  border-left: 4px solid #337ab7;
-  padding: 15px;
-  margin-bottom: 10px;
-  line-height: 1.6;
-}
-/* ADD THESE NEW STYLES TO THE END OF YOUR App.css FILE */
-
-/* --- Main container for all interactive sections --- */
-.interactive-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 60px 20px;
-  background-color: #000;
-}
-
-/* Make the questions area a standard width */
-.questions-area {
-  max-width: 800px;
-  width: 100%;
-}
-
-/* Ensure subsequent sections also take up this width for alignment */
-.piece-info-section, .audio-recorder-section, .performance-feedback-section, .analysis-indicator {
-  max-width: 800px;
-  width: 100%;
-  margin-top: 50px;
-}
-
-/* --- Redesigned Recorder Widget --- */
-.recorder-widget {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  background-color: #1a1a1a;
-  padding: 20px;
-  border-radius: 15px;
-  border: 1px solid #2a2a2a;
-}
-
-.record-button-new {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: #c82333;
-  border: 3px solid #ff7b7b;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  flex-shrink: 0; /* Prevents button from shrinking */
-}
-
-.record-button-new.recording {
-  border-radius: 10px; /* Morph to a square */
-  background-color: #e0e0e0;
-  border-color: #ffffff;
-}
-
-.volume-meter {
-  width: 100%;
-  height: 20px;
-  background-color: #333;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.volume-level {
-  height: 100%;
-  background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336);
-  border-radius: 10px;
-  transition: width 0.1s linear; /* Smooths the meter movement */
-}
-
-/* Add a timer style */
-.timer {
-  font-size: 1.5rem;
-  color: #aaa;
-  margin-top: 10px;
-  text-align: center;
-}
+/* --- Analysis & Feedback Styles --- */
+.analysis-indicator { display: flex; align-items: center; justify-content: center; gap: 15px; font-size: 1.2rem; padding: 40px; color: #ccc; }
+.spinner { border: 4px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top: 4px solid #ffffff; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.performance-feedback-section h3 { font-size: 1.8rem; }
+.feedback-list { list-style: none; padding: 0; margin-top: 20px; }
+.feedback-list li { background-color: #1a1a1a; border-left: 4px solid #337ab7; padding: 15px; margin-bottom: 10px; line-height: 1.6; }
