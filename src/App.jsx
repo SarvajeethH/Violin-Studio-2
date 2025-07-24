@@ -16,7 +16,7 @@ const pieceDatabase = {
     practiceTempo: 60,
   },
   "bach a minor concerto": {
-    title: "Violin Concerto in A minor, BWV 1041",
+    title: "Violin Concerto in A minor Bach",
     description: "One of Bach's most famous concertos, known for its perfectly balanced structure and expressive depth. The outer movements are rhythmically energetic, while the central Andante is a sublime, singing melody over a steady ostinato bass.",
     usualTempo: 92,
     practiceTempo: 72,
@@ -75,7 +75,7 @@ const pieceDatabase = {
   },
   // Vivaldi
   "vivaldi four seasons": {
-    title: "The Four Seasons (Le quattro stagioni)",
+    title: "Vivaldi Four Seasons",
     description: "A set of four violin concertos by Antonio Vivaldi, each giving musical expression to a season of the year. They are among the most famous works of the Baroque period, known for their programmatic and innovative instrumental writing.",
     usualTempo: 100,
     practiceTempo: 80,
