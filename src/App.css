@@ -219,3 +219,78 @@ body {
   margin-bottom: 10px;
   line-height: 1.6;
 }
+/* ADD THESE NEW STYLES TO THE END OF YOUR App.css FILE */
+
+/* --- Main container for all interactive sections --- */
+.interactive-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  background-color: #000;
+}
+
+/* Make the questions area a standard width */
+.questions-area {
+  max-width: 800px;
+  width: 100%;
+}
+
+/* Ensure subsequent sections also take up this width for alignment */
+.piece-info-section, .audio-recorder-section, .performance-feedback-section, .analysis-indicator {
+  max-width: 800px;
+  width: 100%;
+  margin-top: 50px;
+}
+
+/* --- Redesigned Recorder Widget --- */
+.recorder-widget {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid #2a2a2a;
+}
+
+.record-button-new {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #c82333;
+  border: 3px solid #ff7b7b;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  flex-shrink: 0; /* Prevents button from shrinking */
+}
+
+.record-button-new.recording {
+  border-radius: 10px; /* Morph to a square */
+  background-color: #e0e0e0;
+  border-color: #ffffff;
+}
+
+.volume-meter {
+  width: 100%;
+  height: 20px;
+  background-color: #333;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.volume-level {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336);
+  border-radius: 10px;
+  transition: width 0.1s linear; /* Smooths the meter movement */
+}
+
+/* Add a timer style */
+.timer {
+  font-size: 1.5rem;
+  color: #aaa;
+  margin-top: 10px;
+  text-align: center;
+}
