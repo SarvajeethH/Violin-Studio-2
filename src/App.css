@@ -1,131 +1,98 @@
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #000000;
+/* --- Audio Recorder Section --- */
+.audio-recorder-section {
+  margin-top: 50px;
+  padding-top: 30px;
+  border-top: 1px solid #444;
+}
+
+.recorder-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.record-button, .stop-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  font-weight: bold;
+}
+
+.record-button {
+  background-color: #c82333;
   color: white;
 }
-
-.App {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  min-height: 100vh;
+.record-button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
 }
 
-.main-content {
-  text-align: center;
-  flex-grow: 1;
-  padding: 20px;
+.stop-button {
+  background-color: #337ab7;
+  color: white;
+}
+.stop-button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.recording-indicator {
+  margin-top: 15px;
+  color: #c82333;
+  font-weight: bold;
+}
+
+.audio-player {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.analyze-button {
+  display: block;
+  margin: 30px auto 0 auto; /* Center the button */
+}
+
+/* --- AI Feedback Section & Spinner --- */
+.analysis-indicator {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-}
-
-.App-header h1 {
-  font-size: 4rem;
-  margin-bottom: 10px;
-}
-
-.welcome-message {
+  gap: 15px;
   font-size: 1.2rem;
-  margin-bottom: 20px;
+  padding: 40px;
+  color: #ccc;
 }
 
-.description {
-  max-width: 600px;
-  margin: 20px auto;
-  font-size: 1.1rem;
-  line-height: 1.6;
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid #ffffff;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
 }
 
-.side-gallery {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 20px;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.side-gallery img {
-  width: 150px;
-  height: auto;
-  border-radius: 8px;
-  opacity: 0.7;
+.feedback-section {
+  margin-top: 40px;
 }
 
-.cta-button {
-  background-color: #ffffff;
-  color: #000000;
-  border: none;
-  border-radius: 50px;
-  padding: 15px 30px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 30px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+.feedback-list {
+  list-style: none;
+  padding: 0;
 }
 
-.cta-button:hover {
-  background-color: #dddddd;
-  transform: scale(1.05);
-}
-
-.questions-area-container {
-  position: absolute;
-  top: 100vh;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 60px 20px;
-  background-color: #000; /* Ensure black background continues */
-}
-
-.questions-area {
-  max-width: 800px;
-  width: 100%;
-  text-align: left;
-  color: #f0f0f0;
-}
-
-.questions-area h2 {
-  font-size: 2.5rem;
-  text-align: center;
-  margin-bottom: 40px;
-  border-bottom: 2px solid #555;
-  padding-bottom: 10px;
-}
-
-.question {
-  margin-bottom: 30px;
-}
-
-.question label {
-  display: block;
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-}
-
-.question-input {
-  width: 100%;
-  padding: 12px;
+.feedback-list li {
   background-color: #1a1a1a;
-  border: 1px solid #444;
-  border-radius: 5px;
-  color: #ffffff;
-  font-size: 1rem;
-}
-
-.piece-description {
-  margin-top: 50px;
-  padding: 20px;
-  background-color: #111111;
-  border-left: 4px solid #ffffff;
-  line-height: 1.7;
-}
-
-.piece-description h3 {
-  margin-top: 0;
+  border-left: 4px solid #337ab7;
+  padding: 15px;
+  margin-bottom: 10px;
+  line-height: 1.6;
 }
