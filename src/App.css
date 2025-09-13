@@ -186,3 +186,21 @@ body {
   margin-bottom: 20px;
   border-left: 4px solid #4d94ff;
 }
+
+/* Styles for the multi-step analysis status text */
+.analysis-indicator span {
+  font-size: 1.1rem;
+  color: #ccc;
+}
+
+/* Styles for the red error message */
+.analysis-error {
+  background-color: #381a1a;
+  color: #ffcccc;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #c82333;
+  text-align: center;
+}
+
