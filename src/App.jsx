@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// --- THE EXPANDED "BRAIN" OF THE APPLICATION ---
-// The database is now significantly larger and more detailed.
+// --- DATABASE AND SIMULATION LOGIC ---
+// The pieceDatabase remains the same as the last version.
 const pieceDatabase = {
   // Original Set
   "bach_d_minor_partita": { title: "Partita No. 2 in D minor, BWV 1004", keywords: ["bach", "chaconne", "ciaccona"], description: "A cornerstone of the solo violin repertoire by J.S. Bach, renowned for its final movement, the 'Chaconne'...", usualTempo: 76, practiceTempo: 60 },
@@ -50,9 +50,6 @@ const pieceDatabase = {
   // ... and so on for the rest of the new pieces
 };
 
-
-// --- AI FEEDBACK POOL ---
-// Thematically based on the String Magazine article's concepts
 const feedbackPool = {
   intonation: [
     "Your intonation was generally solid, but watch the G# in the upper register; it tended to be slightly sharp.",
@@ -80,31 +77,42 @@ const feedbackPool = {
   ]
 };
 
-// --- NEW DYNAMIC AI ANALYSIS FUNCTION ---
-// Takes the duration of the recording as an argument
-const getCriticalAIAnalysis = (duration) => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const generatedFeedback = [];
-      const numFeedbackPoints = Math.floor(Math.random() * 3) + 2; // Generate 2 to 4 feedback points
-
-      for (let i = 0; i < numFeedbackPoints; i++) {
-        // Generate a random timestamp within the recording's duration
-        const randomTime = Math.random() * duration * 0.9; // Use 90% of duration to avoid the very end
-        const minutes = Math.floor(randomTime / 60).toString().padStart(2, '0');
-        const seconds = Math.floor(randomTime % 60).toString().padStart(2, '0');
-        const timestamp = `${minutes}:${seconds}`;
-
-        // Pick a random category and a random piece of feedback from that category
-        const categories = Object.keys(feedbackPool);
-        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-        const randomNote = feedbackPool[randomCategory][Math.floor(Math.random() * feedbackPool[randomCategory].length)];
-
-        generatedFeedback.push({ timestamp, note: randomNote });
-      }
-      resolve(generatedFeedback);
-    }, 4000);
-  });
+// --- NEW, ADVANCED AI ANALYSIS SIMULATION ---
+const getAdvancedAIAnalysis = async (duration, pieceTitle, setStatus) => {
+  // Stage 1: Initializing and Verification (Simulated)
+  setStatus(`Initializing analysis for "${pieceTitle}"... (Estimated time: 10-15 seconds)`);
+  await new Promise(res => setTimeout(res, 2000));
+  
+  // Simulate checking if the recording is valid (i.e., not whistling)
+  const isAudioValid = Math.random() > 0.1; // 90% chance of being valid
+  if (!isAudioValid) {
+    throw new Error("Analysis failed: The audio is unclear, or a non-violin instrument was detected. Please record again.");
+  }
+  
+  // Stage 2: Melody Extraction (Simulated)
+  setStatus("Step 1/3: Extracting melody and rhythm from your recording...");
+  await new Promise(res => setTimeout(res, 3000 + Math.random() * 2000));
+  
+  // Stage 3: Cross-Referencing (Simulated)
+  setStatus("Step 2/3: Cross-referencing with professional recordings on the web...");
+  await new Promise(res => setTimeout(res, 3000 + Math.random() * 2000));
+  
+  // Stage 4: Comparison and Feedback Generation (Simulated)
+  setStatus("Step 3/3: Comparing your performance and generating feedback...");
+  await new Promise(res => setTimeout(res, 2000));
+  
+  // Final feedback generation logic
+  const generatedFeedback = [];
+  const numFeedbackPoints = Math.floor(Math.random() * 3) + 2; // 2 to 4 points
+  for (let i = 0; i < numFeedbackPoints; i++) {
+    const randomTime = Math.random() * duration * 0.9;
+    const timestamp = formatTime(randomTime);
+    const categories = Object.keys(feedbackPool);
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    const randomNote = feedbackPool[randomCategory][Math.floor(Math.random() * feedbackPool[randomCategory].length)];
+    generatedFeedback.push({ timestamp, note: randomNote });
+  }
+  return generatedFeedback.sort((a, b) => a.timestamp.localeCompare(b.timestamp)); // Sort feedback by time
 };
 
 const fetchPieceInfoAPI = async (pieceName) => {
@@ -119,7 +127,7 @@ const fetchPieceInfoAPI = async (pieceName) => {
       });
       const result = foundKey 
         ? pieceDatabase[foundKey] 
-        : { title: pieceName, description: "Information for this piece could not be found. AI analysis will proceed based on the audio data alone.", notFound: true };
+        : { title: pieceName, description: "Information for this piece could not be found.", notFound: true };
       resolve(result);
     }, 1500);
   });
@@ -132,21 +140,24 @@ const formatTime = (time) => {
 };
 
 function App() {
+  // --- STATE MANAGEMENT ---
   const [uiStage, setUiStage] = useState('welcome');
   const [pieceName, setPieceName] = useState('');
   const [userTempo, setUserTempo] = useState('');
   const [pieceInfo, setPieceInfo] = useState(null);
   const [tempoFeedback, setTempoFeedback] = useState('');
-  const [permission, setPermission] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioURL, setAudioURL] = useState('');
-  const [volume, setVolume] = useState(0);
+  const [savedAudioURL, setSavedAudioURL] = useState(''); // New state for saved recording
   const [aiFeedback, setAiFeedback] = useState([]);
-
+  const [analysisStatus, setAnalysisStatus] = useState(''); // New state for AI status messages
+  const [analysisError, setAnalysisError] = useState(''); // New state for AI errors
+  
+  // Refs
   const questionsRef = useRef(null);
   const recorderRef = useRef(null);
-  const audioPlayerRef = useRef(null); // Ref for the audio player element
+  const audioPlayerRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerIntervalRef = useRef(null);
@@ -154,7 +165,9 @@ function App() {
   const analyserRef = useRef(null);
   const sourceRef = useRef(null);
   const animationFrameRef = useRef(null);
+  const [permission, setPermission] = useState(false);
 
+  // --- CORE FUNCTIONS ---
   const handleInitialScroll = () => {
     setUiStage('questions');
     setTimeout(() => questionsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
@@ -162,14 +175,14 @@ function App() {
   
   const handleSubmitQuestions = async () => {
     if (!pieceName) { alert("Please enter the name of the piece."); return; }
-    setUiStage('analyzing');
-    setTempoFeedback(''); // Reset tempo feedback
+    setUiStage('analyzingPiece'); // A new stage for just fetching piece info
+    setTempoFeedback('');
     const info = await fetchPieceInfoAPI(pieceName);
     setPieceInfo(info);
-
-    // --- NEW: TEMPO ANALYSIS LOGIC ---
+    
     if (userTempo && !info.notFound) {
-      const userBPM = parseInt(userTempo, 10);
+      // Tempo analysis logic... (same as before)
+       const userBPM = parseInt(userTempo, 10);
       const targetBPM = info.usualTempo;
       const difference = userBPM - targetBPM;
       const percentageDiff = Math.abs(difference / targetBPM);
@@ -186,7 +199,6 @@ function App() {
         }
       }
     }
-    
     setUiStage('describing');
   };
 
@@ -195,6 +207,26 @@ function App() {
     setTimeout(() => recorderRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
+  const startRecordingFlow = () => {
+    if (audioURL) {
+      setSavedAudioURL(audioURL); // Save the current recording before starting a new one
+    }
+    audioChunksRef.current = [];
+    setAudioURL('');
+    setAiFeedback([]);
+    setAnalysisError('');
+    mediaRecorderRef.current.start();
+    setIsRecording(true);
+    setRecordingTime(0);
+    timerIntervalRef.current = setInterval(() => setRecordingTime(prev => prev + 1), 1000);
+    visualizeVolume();
+    mediaRecorderRef.current.ondataavailable = (event) => audioChunksRef.current.push(event.data);
+    mediaRecorderRef.current.onstop = () => {
+      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+      setAudioURL(URL.createObjectURL(audioBlob));
+    };
+  };
+  
   const handleRecordClick = async () => {
     if (!permission) {
         try {
@@ -213,22 +245,6 @@ function App() {
     }
   };
 
-  const startRecordingFlow = () => {
-    audioChunksRef.current = [];
-    setAudioURL('');
-    setAiFeedback([]);
-    mediaRecorderRef.current.start();
-    setIsRecording(true);
-    setRecordingTime(0);
-    timerIntervalRef.current = setInterval(() => setRecordingTime(prev => prev + 1), 1000);
-    visualizeVolume();
-    mediaRecorderRef.current.ondataavailable = (event) => audioChunksRef.current.push(event.data);
-    mediaRecorderRef.current.onstop = () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-      setAudioURL(URL.createObjectURL(audioBlob));
-    };
-  };
-
   const stopRecordingFlow = () => {
     mediaRecorderRef.current.stop();
     setIsRecording(false);
@@ -238,6 +254,7 @@ function App() {
   };
 
   const visualizeVolume = () => {
+    // This function remains the same
     const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
     const draw = () => {
       animationFrameRef.current = requestAnimationFrame(draw);
@@ -250,44 +267,56 @@ function App() {
   };
 
   const analyzeRecording = async () => {
-    if (!audioPlayerRef.current || !audioPlayerRef.current.duration) {
-      alert("Audio not ready for analysis yet.");
-      return;
-    }
+    if (!audioPlayerRef.current || !audioPlayerRef.current.duration) return;
     const duration = audioPlayerRef.current.duration;
     setUiStage('analyzing');
-    const feedback = await getCriticalAIAnalysis(duration);
-    setAiFeedback(feedback);
-    setUiStage('feedback');
-  };
+    setAnalysisError('');
+    setAiFeedback([]);
 
+    try {
+      const feedback = await getAdvancedAIAnalysis(duration, pieceInfo.title, setAnalysisStatus);
+      setAiFeedback(feedback);
+      setUiStage('feedback');
+    } catch (error) {
+      setAnalysisError(error.message);
+      setUiStage('feedback'); // Go to feedback stage to show the error
+    } finally {
+      setAnalysisStatus('');
+    }
+  };
+  
+  const handleStartNewAnalysis = () => {
+    // Reset all relevant states
+    setPieceName('');
+    setUserTempo('');
+    setPieceInfo(null);
+    setTempoFeedback('');
+    setAudioURL('');
+    setSavedAudioURL('');
+    setAiFeedback([]);
+    setAnalysisError('');
+    setUiStage('questions');
+    // Scroll back to the top of the interactive area
+    questionsRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
   return (
     <div className="App-container">
       <div className="App">
-        {/* Side Galleries and Header are unchanged */}
-        <div className="side-gallery left">
-          <img src="/violin1.jpg" alt="Close-up of a violin body" />
-          <img src="/violin2.jpg" alt="Person playing a violin" />
-        </div>
+        <div className="side-gallery left"><img src="/violin1.jpg" alt="Violin body"/><img src="/violin2.jpg" alt="Violinist"/></div>
         <main className="main-content">
           <header className="App-header">
             <h1>Violin Studio</h1>
             <p className="welcome-message">Welcome to the AI-Optimized Acoustic Enhancer Dashboard!</p>
-            <p className="description">
-              This application is designed to help you grow as a musician by providing cutting-edge tools to refine your sound. Our AI-powered features analyze your playing and offer feedback to enhance your acoustic quality. Take your violin skills to the next level and unlock your true potential.
-            </p>
+            <p className="description">This application is designed to help you grow as a musician by providing cutting-edge tools to refine your sound. Our AI-powered features analyze your playing and offer feedback to enhance your acoustic quality. Take your violin skills to the next level and unlock your true potential.</p>
             <button className="cta-button" onClick={handleInitialScroll}>Start Your Analysis</button>
           </header>
         </main>
-        <div className="side-gallery right">
-          <img src="/violin3.jpg" alt="Violin on top of sheet music" />
-          <img src="/violin4.jpg" alt="Violin against a dark background" />
-        </div>
+        <div className="side-gallery right"><img src="/violin3.jpg" alt="Violin on sheet music"/><img src="/violin4.jpg" alt="Violin details"/></div>
       </div>
 
       {(uiStage !== 'welcome') && (
         <div className="interactive-container" ref={questionsRef}>
-          {/* Questions Area is unchanged */}
           <div className="questions-area">
             <h2>Practice Analysis</h2>
             <div className="question">
@@ -298,10 +327,11 @@ function App() {
               <label htmlFor="tempo">What tempo (in BPM) are you taking it?</label>
               <input type="number" id="tempo" className="question-input" placeholder="e.g., 60" value={userTempo} onChange={(e) => setUserTempo(e.target.value)} />
             </div>
-            <button className="cta-button" onClick={handleSubmitQuestions} disabled={uiStage !== 'questions'}>Submit for Description</button>
+            <button className="cta-button" onClick={handleSubmitQuestions} disabled={uiStage === 'analyzing' || uiStage === 'analyzingPiece'}>
+              {uiStage === 'analyzingPiece' ? 'Searching...' : 'Submit for Description'}
+            </button>
           </div>
 
-          {/* Piece Info Section now includes Tempo Feedback */}
           {pieceInfo && (uiStage === 'describing' || uiStage === 'recording' || uiStage === 'feedback') && (
               <div className="piece-info-section">
                   <h3>About: {pieceInfo.title}</h3>
@@ -317,42 +347,53 @@ function App() {
               </div>
           )}
           
-          {/* Recorder now has a ref on the audio element */}
           {(uiStage === 'recording' || uiStage === 'feedback') && (
               <div className="audio-recorder-section" ref={recorderRef}>
                   <h3>Record Your Performance</h3>
                   <div className="recorder-widget">
                       <button className={`record-button-new ${isRecording ? 'recording' : ''}`} onClick={handleRecordClick}></button>
-                      <div className="volume-meter">
-                          <div className="volume-level" style={{ width: `${Math.min(volume * 2, 100)}%` }}></div>
-                      </div>
+                      <div className="volume-meter"><div className="volume-level" style={{ width: `${Math.min(volume * 2, 100)}%` }}></div></div>
                   </div>
                   {isRecording && <div className="timer">{formatTime(recordingTime)}</div>}
+                  
+                  {savedAudioURL && (
+                    <div className="audio-result">
+                        <h4>Previous Recording:</h4>
+                        <audio src={savedAudioURL} controls className="audio-player" />
+                    </div>
+                  )}
+
                   {audioURL && (
                       <div className="audio-result">
-                          <h4>Your Recording:</h4>
+                          <h4>Current Recording:</h4>
                           <audio src={audioURL} controls className="audio-player" ref={audioPlayerRef} />
-                          <button className="cta-button analyze-button" onClick={analyzeRecording}>Analyze My Recording</button>
+                          <button className="cta-button analyze-button" onClick={analyzeRecording} disabled={uiStage === 'analyzing'}>
+                            Analyze My Recording
+                          </button>
                       </div>
                   )}
               </div>
           )}
 
-          {/* Analysis and Feedback sections are unchanged */}
           {uiStage === 'analyzing' && (
               <div className="analysis-indicator">
                   <div className="spinner"></div>
-                  {pieceInfo ? "Comparing your performance against reference recordings..." : "Looking up piece information..."}
+                  <span>{analysisStatus || "Preparing analysis..."}</span>
               </div>
           )}
-          {uiStage === 'feedback' && aiFeedback.length > 0 && (
+          
+          {(uiStage === 'feedback') && (
               <div className="performance-feedback-section">
                   <h3>Performance Analysis</h3>
-                  <ul className="feedback-list">
-                      {aiFeedback.map((item, index) => (
-                          <li key={index}><strong>Timestamp [{item.timestamp}]:</strong> {item.note}</li>
-                      ))}
-                  </ul>
+                  {analysisError && <div className="analysis-error">{analysisError}</div>}
+                  {aiFeedback.length > 0 && 
+                    <ul className="feedback-list">
+                        {aiFeedback.map((item, index) => (
+                            <li key={index}><strong>Timestamp [{item.timestamp}]:</strong> {item.note}</li>
+                        ))}
+                    </ul>
+                  }
+                  <button className="cta-button" onClick={handleStartNewAnalysis}>Start New Analysis</button>
               </div>
           )}
         </div>
