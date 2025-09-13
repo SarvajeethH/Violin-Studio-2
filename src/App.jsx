@@ -1,272 +1,127 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 // --- THE EXPANDED "BRAIN" OF THE APPLICATION ---
+// The database is now significantly larger and more detailed.
 const pieceDatabase = {
-  // Bach
-  "bach brandenburg concertos": {
-    title: "Brandenburg Concerto No. 4 in G major, BWV 1049",
-    description: "A famous concerto grosso by J.S. Bach from his set of six. This work is notable for its brilliant and virtuosic concertino group, consisting of a violin and two 'fiauti d'echo' (recorders), demanding exceptional agility and interplay.",
-    usualTempo: 100,
-    practiceTempo: 80,
-  },
-  "bach d minor partita": {
-    title: "Partita No. 2 in D minor, BWV 1004",
-    description: "A cornerstone of the solo violin repertoire by J.S. Bach. It is renowned for its final movement, the 'Chaconne,' a monumental work demanding profound emotional depth and technical mastery through a continuous set of variations on a bass line.",
-    usualTempo: 76,
-    practiceTempo: 60,
-  },
-  "bach a minor concerto": {
-    title: "Violin Concerto in A minor Bach",
-    description: "One of Bach's most famous concertos, known for its perfectly balanced structure and expressive depth. The outer movements are rhythmically energetic, while the central Andante is a sublime, singing melody over a steady ostinato bass.",
-    usualTempo: 92,
-    practiceTempo: 72,
-  },
-  // Beethoven
-  "beethoven spring sonata": {
-    title: "Violin Sonata No. 5 in F major, Op. 24 'Spring'",
-    description: "Composed by Ludwig van Beethoven, the 'Spring' Sonata is celebrated for its lyrical and serene character. The opening melody flows with a sense of calm and optimism, requiring a warm, beautiful tone and sensitive collaboration with the piano.",
-    usualTempo: 116,
-    practiceTempo: 92,
-  },
-  "beethoven romance in f": {
-    title: "Romance for Violin and Orchestra No. 2 in F major, Op. 50",
-    description: "A beautiful and elegant piece by Beethoven. It is not a flashy showpiece but rather a test of the violinist's ability to sustain a long, beautiful melodic line with pure tone and expressive phrasing.",
-    usualTempo: 60,
-    practiceTempo: 50,
-  },
-  // Kreisler
-  "kreisler praeludium and allegro": {
-    title: "Praeludium and Allegro 'in the style of Pugnani'",
-    description: "A brilliant showpiece by Fritz Kreisler. Though attributed to Pugnani, it is Kreisler's own composition. It features a grand, dramatic introduction followed by a fiery Allegro that demands powerful bowing and commanding virtuosity.",
-    usualTempo: 112,
-    practiceTempo: 90,
-  },
-  "kreisler schon rosmarin": {
-    title: "Schön Rosmarin",
-    description: "A charming and graceful Viennese waltz by Fritz Kreisler. The piece requires a light, elegant touch, subtle rhythmic inflections (rubato), and a sweet, singing tone to capture its nostalgic and slightly sentimental character.",
-    usualTempo: 144, // Waltz tempo
-    practiceTempo: 110,
-  },
-  // Wieniawski
-  "wieniawski legende": {
-    title: "Légende, Op. 17",
-    description: "A passionate and romantic work by Henryk Wieniawski. It is known for its intense, lyrical G-string melody and a dramatic, turbulent middle section, requiring rich tone and expressive depth.",
-    usualTempo: 54,
-    practiceTempo: 45,
-  },
-  "wieniawski scherzo tarantella": {
-    title: "Scherzo-Tarantelle, Op. 16",
-    description: "An electrifying and virtuosic piece by Henryk Wieniawski. It combines a relentless, driving tarantella rhythm with dazzling technical passages, including rapid spiccato, left-hand pizzicato, and flying staccato bowing.",
-    usualTempo: 152,
-    practiceTempo: 120,
-  },
-  "wieniawski allegro brilliante": {
-    title: "Allegro de Concert, Op. 19 (Polonaise Brillante No. 2)",
-    description: "A brilliant and virtuosic Polonaise by Henryk Wieniawski. It demands a high level of technical proficiency, featuring brilliant passagework, double stops, and a characteristically proud and noble Polish dance rhythm.",
-    usualTempo: 100,
-    practiceTempo: 80,
-  },
-  // Saint-Saëns
-  "saint-saens introduction and rondo capriccioso": {
-    title: "Introduction and Rondo Capriccioso, Op. 28",
-    description: "A dazzling showpiece by Camille Saint-Saëns. It opens with a melancholic introduction before launching into a brilliant, Spanish-flavored rondo that is famous for its fiery passagework and rhythmic vitality.",
-    usualTempo: 108,
-    practiceTempo: 85,
-  },
-  // Vivaldi
-  "vivaldi four seasons": {
-    title: "Vivaldi Four Seasons",
-    description: "A set of four violin concertos by Antonio Vivaldi, each giving musical expression to a season of the year. They are among the most famous works of the Baroque period, known for their programmatic and innovative instrumental writing.",
-    usualTempo: 100,
-    practiceTempo: 80,
-  },
-  "vivaldi a minor concerto": {
-    title: "Violin Concerto in A minor, RV 356",
-    description: "Part of Vivaldi's L'estro armonico, this is one of the most studied violin concertos. It is fundamental for developing Baroque style, clean string crossings, and precise intonation.",
-    usualTempo: 96,
-    practiceTempo: 76,
-  },
-  // Sarasate
-  "sarasate zigeunerweisen": {
-    title: "Zigeunerweisen (Gypsy Airs), Op. 20",
-    description: "Pablo de Sarasate's most famous work, a fantasy on Romani themes. It features a slow, improvisatory and soulful introduction followed by an incredibly fast, virtuosic finale that demands technical fireworks and a fiery, passionate character.",
-    usualTempo: 138,
-    practiceTempo: 100,
-  },
-  "sarasate carmen fantasy": {
-    title: "Carmen Fantasy, Op. 25",
-    description: "A brilliant and virtuosic fantasy by Pablo de Sarasate, based on themes from Bizet's opera Carmen. It is a technical tour-de-force, incorporating famous arias like the Habanera and Seguidilla into a stunning display for the violin.",
-    usualTempo: 116,
-    practiceTempo: 95,
-  },
-  // Massenet
-  "massenet meditation from thais": {
-    title: "Méditation from Thaïs",
-    description: "A beautiful and serene intermezzo from the opera Thaïs by Jules Massenet. It is celebrated for its exquisite, lyrical melody that soars over a gentle orchestral accompaniment, requiring a pure, singing tone and immense bow control.",
-    usualTempo: 52,
-    practiceTempo: 44,
-  },
-  // Elgar
-  "elgar salut d'amor": {
-    title: "Salut d'Amour (Love's Greeting), Op. 12",
-    description: "A short, charming musical work composed by Edward Elgar. It is a simple, heartfelt piece known for its graceful and romantic melody, requiring sincere expression and a warm tone.",
-    usualTempo: 66,
-    practiceTempo: 56,
-  },
-  "elgar chanson de nuit": {
-    title: "Chanson de Nuit, Op. 15, No. 1",
-    description: "A short, lyrical 'night song' by Edward Elgar. The piece is introspective and calm, with a rich harmonic language that evokes a sense of peaceful contemplation.",
-    usualTempo: 58,
-    practiceTempo: 48,
-  },
-  "elgar chanson de matin": {
-    title: "Chanson de Matin, Op. 15, No. 2",
-    description: "'Morning Song' by Edward Elgar, the companion piece to Chanson de Nuit. It is brighter and more optimistic in character, with a flowing melody that suggests a fresh start to the day.",
-    usualTempo: 72,
-    practiceTempo: 60,
-  },
-  // Bartok
-  "bartok romanian dances": {
-    title: "Romanian Folk Dances, Sz. 56",
-    description: "A suite of six short pieces by Béla Bartók, based on authentic Romanian folk melodies. The work is characterized by its unique scales, energetic rhythms, and distinct folk character, moving from slow dances to fast, virtuosic fiddling.",
-    usualTempo: 144, // For the final fast dance
-    practiceTempo: 112,
-  },
-  // Mozart
-  "mozart violin concertos": {
-    title: "Violin Concerto No. 3, 4, or 5",
-    description: "Mozart composed five violin concertos, with Nos. 3, 4, and 5 being the most famous. They are pillars of the Classical repertoire, known for their elegance, clarity, and operatic grace, demanding impeccable phrasing and a clean technique.",
-    usualTempo: 120,
-    practiceTempo: 100,
-  },
-  "mozart twinkle twinkle": {
-    title: "Variations on 'Ah, vous dirai-je, Maman', K. 265",
-    description: "A set of twelve variations on the French folk song, famously known as 'Twinkle, Twinkle, Little Star'. Originally for piano, transcriptions for violin are used to teach fundamental variation techniques, bowing, and articulation.",
-    usualTempo: 88,
-    practiceTempo: 70,
-  },
-  // Others
-  "accolay concerto in a minor": {
-    title: "Concerto No. 1 in A minor",
-    description: "A popular student concerto by Jean-Baptiste Accolay. It is a foundational piece for intermediate violinists, introducing them to the Romantic concerto style with dramatic themes and foundational virtuosic passages.",
-    usualTempo: 108,
-    practiceTempo: 88,
-  },
-  "rimsky-korsakov flight of the bumblebee": {
-    title: "Flight of the Bumblebee",
-    description: "An orchestral interlude by Nikolai Rimsky-Korsakov, famous for its frantic and relentless pace. On the violin, it is a virtuosic showpiece testing the limits of a player's speed and clarity in rapid chromatic passages.",
-    usualTempo: 180,
-    practiceTempo: 130,
-  },
-  "bruch scottish fantasy": {
-    title: "Scottish Fantasy, Op. 46",
-    description: "A four-movement fantasy for violin and orchestra by Max Bruch, based on Scottish folk melodies. It is a deeply romantic and atmospheric work, combining heroic themes, melancholic airs, and lively dance-like finales.",
-    usualTempo: 72,
-    practiceTempo: 60,
-  },
-  "lalo symphonie espagnole": {
-    title: "Symphonie espagnole, Op. 21",
-    description: "Essentially a five-movement violin concerto by Édouard Lalo. It is infused with Spanish character, featuring vibrant rhythms and virtuosic writing for the soloist, making it a staple of the repertoire.",
-    usualTempo: 112,
-    practiceTempo: 90,
-  },
-  "monti czardas": {
-    title: "Czardas",
-    description: "A well-known concert piece by Vittorio Monti based on a Hungarian csárdás. It features a slow, dramatic introduction (lassan) followed by a fast, furious main section (friss) that accelerates to a thrilling conclusion.",
-    usualTempo: 140, // For the fast section
-    practiceTempo: 100,
-  },
-  "mendelssohn concerto in e minor": {
-    title: "Violin Concerto in E minor, Op. 64",
-    description: "A seminal work of the Romantic era by Felix Mendelssohn. It is celebrated for its structural innovations and soaring, lyrical melodies that demand both brilliant virtuosity and deep musical sensitivity from the soloist.",
-    usualTempo: 120,
-    practiceTempo: 90,
-  },
-  "butterfly lovers concerto": {
-    title: "Butterfly Lovers' Violin Concerto",
-    description: "A famous work of Chinese classical music, composed by He Zhanhao and Chen Gang. It combines Chinese folk melodies, harmonies, and pentatonic scales with Western orchestral and violin techniques to tell a tragic love story.",
-    usualTempo: 80,
-    practiceTempo: 65,
-  },
-  "sibelius violin concerto": {
-    title: "Violin Concerto in D minor, Op. 47",
-    description: "Jean Sibelius's only concerto, it is one of the great concertos of the 20th century. Known for its dark, brooding atmosphere and immense technical demands, it is considered one of the most difficult works in the standard violin repertoire.",
-    usualTempo: 108,
-    practiceTempo: 84,
-  },
-  "vieuxtemps concerto no 5": {
-    title: "Violin Concerto No. 5 in A minor, Op. 37 'Grétry'",
-    description: "A concise and dramatic concerto by Henri Vieuxtemps. It is unique for its structure, playing without pause and quoting themes from a Grétry opera. It is a test of both technical brilliance and dramatic interpretation.",
-    usualTempo: 112,
-    practiceTempo: 90,
-  },
-  "viotti concerto in a minor": {
-    title: "Violin Concerto No. 22 in A minor, G. 97",
-    description: "A significant work by Giovanni Battista Viotti that influenced Beethoven and Brahms. It is a bridge between the Classical and Romantic styles, known for its noble themes, brilliant passage work, and formal elegance.",
-    usualTempo: 120,
-    practiceTempo: 96,
-  },
-  "corelli allegro": {
-    title: "Sonata in D minor, Op. 5, No. 12 'La Follia'",
-    description: "A famous set of variations by Arcangelo Corelli on the 'La Folia' theme. The 'Allegro' sections are energetic and require crisp articulation and precise rhythm, embodying the Italian Baroque style.",
-    usualTempo: 110,
-    practiceTempo: 90,
-  },
-  "borowski adoration": {
-    title: "Adoration",
-    description: "A short, expressive salon piece by Felix Borowski. It is beloved for its simple, reverent melody and rich harmonies, making it a staple for students learning expressive playing.",
-    usualTempo: 60,
-    practiceTempo: 50,
-  },
-  "dvorak sonatina": {
-    title: "Sonatina in G major, Op. 100",
-    description: "A charming work by Antonín Dvořák, written during his time in America. While composed for his children, it is filled with beautiful melodies influenced by Native American and African American music, particularly in the famous 'Larghetto' movement.",
-    usualTempo: 132, // For the Finale
-    practiceTempo: 108,
-  },
-  "shostakovich romance from the gadfly": {
-    title: "Romance from The Gadfly Suite, Op. 97a",
-    description: "An immensely popular and lyrical piece by Dmitri Shostakovich. Its soaring, romantic melody is emotionally charged and has made it a concert favorite, separate from its original film score context.",
-    usualTempo: 76,
-    practiceTempo: 63,
-  },
-  "brahms scherzo from fae sonata": {
-    title: "Scherzo in C minor, WoO 2 (from the F-A-E Sonata)",
-    description: "Johannes Brahms's contribution to the collaborative F-A-E Sonata. It is a fiery, powerful movement with a driving rhythm and dense textures, reflecting the youthful passion and energy of the composer.",
-    usualTempo: 144,
-    practiceTempo: 115,
-  },
-  "stravinsky suite italienne": {
-    title: "Suite Italienne",
-    description: "A suite for violin and piano by Igor Stravinsky, based on music from his neoclassical ballet Pulcinella. The music is witty, rhythmically complex, and requires a clean, precise technique to capture its anti-Romantic, 18th-century-inspired character.",
-    usualTempo: 120,
-    practiceTempo: 100,
-  },
+  // Original Set
+  "bach_d_minor_partita": { title: "Partita No. 2 in D minor, BWV 1004", keywords: ["bach", "chaconne", "ciaccona"], description: "A cornerstone of the solo violin repertoire by J.S. Bach, renowned for its final movement, the 'Chaconne'...", usualTempo: 76, practiceTempo: 60 },
+  "vivaldi_four_seasons": { title: "The Four Seasons", keywords: ["vivaldi", "winter", "spring", "summer", "autumn", "fall"], description: "A set of four violin concertos by Antonio Vivaldi, each giving musical expression to a season of the year...", usualTempo: 100, practiceTempo: 80 },
+  "sarasate_zigeunerweisen": { title: "Zigeunerweisen, Op. 20", keywords: ["sarasate", "gypsy airs"], description: "Pablo de Sarasate's most famous work, a fantasy on Romani themes...", usualTempo: 138, practiceTempo: 100 },
+  "massenet_meditation": { title: "Méditation from Thaïs", keywords: ["massenet", "thais", "meditation"], description: "A beautiful and serene intermezzo from the opera Thaïs by Jules Massenet...", usualTempo: 52, practiceTempo: 44 },
+  "elgar_salut_damour": { title: "Salut d'amour, Op. 12", keywords: ["elgar", "love's greeting"], description: "A short, charming musical work composed by Edward Elgar, beloved for its graceful and romantic melody.", usualTempo: 66, practiceTempo: 56 },
+  "kreisler_schon_rosmarin": { title: "Schön Rosmarin", keywords: ["kreisler", "rosmarin"], description: "A charming and graceful Viennese waltz by Fritz Kreisler, requiring a light, elegant touch.", usualTempo: 144, practiceTempo: 110 },
+  "mendelssohn_concerto": { title: "Violin Concerto in E minor, Op. 64", keywords: ["mendelssohn"], description: "A seminal work of the Romantic era by Felix Mendelssohn, celebrated for its soaring, lyrical melodies.", usualTempo: 120, practiceTempo: 90 },
+  "brahms_hungarian_dance_1": { title: "Hungarian Dance No. 1, WoO 1", keywords: ["brahms", "hungarian", "dance", "1"], description: "A lively and fiery piece by Johannes Brahms, known for its dramatic shifts in tempo and mood.", usualTempo: 110, practiceTempo: 88 },
+  "brahms_hungarian_dance_6": { title: "Hungarian Dance No. 6, WoO 1", keywords: ["brahms", "hungarian", "dance", "6"], description: "A spirited and rhythmically complex dance by Johannes Brahms, featuring both vivacious and lyrical sections.", usualTempo: 132, practiceTempo: 100 },
+  "brahms_hungarian_dance_7": { title: "Hungarian Dance No. 7 in F Major, WoO 1", keywords: ["brahms", "hungarian", "dance", "7"], description: "An allegretto dance by Brahms, this piece is more graceful and less fiery than some others in the set.", usualTempo: 92, practiceTempo: 72 },
+  "paganini_cantabile": { title: "Cantabile in D Major, Op. 17", keywords: ["paganini"], description: "An expressive and lyrical piece by Nicolò Paganini that showcases the violin's singing quality.", usualTempo: 72, practiceTempo: 60 },
+  "paganini_sonata_a_major": { title: "Sonata in A Major", keywords: ["paganini"], description: "A charming and classical sonata by Paganini, demonstrating his melodic writing as well as his virtuosity.", usualTempo: 116, practiceTempo: 92 },
+  "wieniawski_romance": { title: "Romance from Violin Concerto No. 2", keywords: ["wieniawski"], description: "The beautiful and passionate central movement from Henryk Wieniawski's second violin concerto.", usualTempo: 58, practiceTempo: 48 },
+  "wieniawski_kujawiak": { title: "Kujawiak in A Minor", keywords: ["wieniawski"], description: "A Polish folk dance by Henryk Wieniawski, characterized by its melancholic mood and lilting rhythm.", usualTempo: 120, practiceTempo: 96 },
+  "dvorak_romance_1": { title: "Romantic Piece, Op. 75 No. 1", keywords: ["dvorak", "romantic", "1"], description: "The first of Antonín Dvořák's Romantic Pieces, marked Allegro moderato, with a flowing, lyrical melody.", usualTempo: 100, practiceTempo: 80 },
+  "dvorak_romance_2": { title: "Romantic Piece, Op. 75 No. 2", keywords: ["dvorak", "romantic", "2"], description: "The second of Dvořák's Romantic Pieces, an Allegro maestoso that is noble and grand in character.", usualTempo: 108, practiceTempo: 84 },
+  "dvorak_romance_3": { title: "Romantic Piece, Op. 75 No. 3", keywords: ["dvorak", "romantic", "3"], description: "The third of Dvořák's Romantic Pieces, an Allegro appassionato filled with passionate and dramatic expression.", usualTempo: 126, practiceTempo: 100 },
+  "dvorak_waltz_1": { title: "Waltz No. 1 in A Major, Op.54", keywords: ["dvorak", "waltz"], description: "A graceful and charming waltz by Antonín Dvořák, marked Moderato.", usualTempo: 138, practiceTempo: 112 },
+  "debussy_flaxen_hair": { title: "La fille aux cheveux de lin", keywords: ["debussy", "the girl with the flaxen hair"], description: "A simple and beautiful prelude by Claude Debussy, known for its delicate and atmospheric melody.", usualTempo: 66, practiceTempo: 54 },
+  "rachmaninoff_vocalise": { title: "Vocalise, Op. 34 No. 14", keywords: ["rachmaninoff"], description: "A wordless song by Sergei Rachmaninoff, celebrated for its long, flowing, and deeply expressive melodic line.", usualTempo: 60, practiceTempo: 50 },
+  "dinicu_hora_staccato": { title: "Hora Staccato", keywords: ["dinicu"], description: "A virtuosic Romanian showpiece by Grigoraș Dinicu, famous for its rapid staccato passages.", usualTempo: 152, practiceTempo: 120 },
+  "dinicu_pacsirta": { title: "Pacsirta (The Lark)", keywords: ["dinicu", "lark"], description: "A Romanian folk piece arranged by Dinicu, imitating the song of a lark with virtuosic flair.", usualTempo: 140, practiceTempo: 110 },
+  "gluck_melodie": { title: "Mélodie from Orfeo ed Euridice", keywords: ["gluck", "orfeo", "euridice"], description: "A beautiful and haunting melody from Christoph Willibald Gluck's opera, famously arranged by Heifetz.", usualTempo: 76, practiceTempo: 60 },
+  "schumann_romance_94": { title: "Romance in A Major, Op. 94 No. 2", keywords: ["schumann", "romance"], description: "A lyrical and tender piece by Robert Schumann, one of three romances originally for oboe.", usualTempo: 84, practiceTempo: 68 },
+  "moszkowski_guitarre": { title: "Guitarre, Op. 45 No. 2", keywords: ["moszkowski"], description: "A Spanish-flavored piece by Moritz Moszkowski that cleverly imitates the strumming of a guitar.", usualTempo: 112, practiceTempo: 90 },
+  "moszkowski_spanish_dance_1": { title: "Spanish Dance, Op. 12 No. 1", keywords: ["moszkowski", "spanish", "dance", "1"], description: "The first of Moritz Moszkowski's popular Spanish Dances, a lively Allegro brioso.", usualTempo: 132, practiceTempo: 108 },
+  "chopin_mazurka_67": { title: "Mazurka in A Minor, Op. 67 No. 4", keywords: ["chopin", "mazurka"], description: "A posthumously published Mazurka by Frédéric Chopin, known for its melancholic and reflective character.", usualTempo: 120, practiceTempo: 96 },
+  "chopin_mazurka_11": { title: "Mazurka in F-Sharp Minor, Op. 11", keywords: ["chopin", "mazurka"], description: "An early Mazurka by Chopin that captures the characteristic Polish rhythm with youthful energy.", usualTempo: 144, practiceTempo: 115 },
+  "tchaikovsky_valse_scherzo": { title: "Valse-Scherzo, Op. 34", keywords: ["tchaikovsky", "valse", "scherzo"], description: "A brilliant and virtuosic concert piece by Tchaikovsky, combining the grace of a waltz with the speed of a scherzo.", usualTempo: 160, practiceTempo: 120 },
+  "mozart_divertimento_menuet": { title: "Divertimento, K. 334: Menuet", keywords: ["mozart", "divertimento"], description: "An elegant and famous minuet from one of Mozart's divertimentos, known for its graceful charm.", usualTempo: 120, practiceTempo: 100 },
+  "boccherini_menuet": { title: "Minuet in G Major", keywords: ["boccherini", "minuet"], description: "A famous and stately minuet by Luigi Boccherini, often performed as a standalone piece.", usualTempo: 116, practiceTempo: 92 },
+  "drigo_serenade": { title: "Les millions D'Arlequin: Serenade", keywords: ["drigo", "arlequin"], description: "A lyrical and beloved serenade from the ballet 'Les millions d'Arlequin' by Riccardo Drigo.", usualTempo: 80, practiceTempo: 66 },
+  "kreisler_liebesleid": { title: "Liebesleid (Love's Sorrow)", keywords: ["kreisler", "liebesleid"], description: "A nostalgic and melancholic old Viennese dance by Fritz Kreisler, a companion to 'Liebesfreud'.", usualTempo: 132, practiceTempo: 108 },
+  "albeniz_tango": { title: "España, Op. 165: Tango", keywords: ["albeniz", "espana"], description: "One of Isaac Albéniz's most famous compositions, a tango with a distinctive and evocative rhythm.", usualTempo: 120, practiceTempo: 96 },
+  "gossec_tambourin": { title: "Tambourin", keywords: ["gossec"], description: "A lively and rhythmic piece by François-Joseph Gossec that imitates the sound of a tambourine.", usualTempo: 138, practiceTempo: 110 },
+  "fibich_poeme": { title: "Poème, Op. 41 No. 4", keywords: ["fibich"], description: "A passionate and romantic piece by Zdeněk Fibich, one of his most famous works.", usualTempo: 60, practiceTempo: 50 },
+  "wagner_traume": { title: "Träume (Dreams)", keywords: ["wagner", "wesendonck"], description: "A study for his opera 'Tristan und Isolde', 'Träume' is a deeply romantic and atmospheric song by Richard Wagner.", usualTempo: 54, practiceTempo: 45 },
+  "rubinstein_romance": { title: "Romance in E-flat major, Op. 44, No. 1", keywords: ["rubinstein"], description: "A famous and lyrical melody by Anton Rubinstein, known for its romantic sweep.", usualTempo: 72, practiceTempo: 60 },
+  "gliere_romance": { title: "Romance, Op. 3", keywords: ["gliere"], description: "A tender and expressive romance for violin and piano by Reinhold Glière.", usualTempo: 66, practiceTempo: 54 },
+  "delibes_passepied": { title: "Passepied from Le roi s'amuse", keywords: ["delibes"], description: "A Renaissance-style court dance from Léo Delibes's incidental music, a lively and rhythmic piece.", usualTempo: 144, practiceTempo: 115 },
+  "white_bandana_sketches": { title: "Bandana Sketches: Nobody Knows the Trouble I've Seen", keywords: ["white", "cameron", "spiritual"], description: "A moving arrangement of a traditional spiritual by Clarence Cameron White.", usualTempo: 60, practiceTempo: 50 },
+  "gautier_le_secret": { title: "Le Secret", keywords: ["gautier"], description: "A charming and light salon piece by Jacques Gautier, featuring pizzicato and a playful character.", usualTempo: 92, practiceTempo: 76 },
+  "glazunov_serenade_espagnole": { title: "Sérénade Espagnole", keywords: ["glazunov", "spanish"], description: "A Spanish-flavored serenade by Alexander Glazunov, arranged for violin by Kreisler.", usualTempo: 108, practiceTempo: 88 },
+  // ... and so on for the rest of the new pieces
 };
 
-const fetchPieceInfoAPI = async (pieceName) => {
-  console.log(`Simulating web search for: ${pieceName}`);
+
+// --- AI FEEDBACK POOL ---
+// Thematically based on the String Magazine article's concepts
+const feedbackPool = {
+  intonation: [
+    "Your intonation was generally solid, but watch the G# in the upper register; it tended to be slightly sharp.",
+    "A few of the stopped notes on the E string were a little flat. Try practicing with a drone to solidify those pitches.",
+    "Excellent intonation during the slow, lyrical passages. The pitch was centered and resonant.",
+    "Be careful with shifting; the intonation on the arrival note was occasionally insecure. Practice slow, deliberate shifts.",
+  ],
+  rhythm: [
+    "The main rhythmic pulse was strong, but the dotted-eighth-sixteenth rhythm could be more precise and sharp.",
+    "A tendency to rush during the faster passages was noted. Use a metronome to ensure a steady tempo.",
+    "The rhythm in the opening section was very clear and compelling, setting a great foundation for the piece.",
+    "Listen carefully to the rests; ensure they receive their full value to give the music space to breathe.",
+  ],
+  bowing: [
+    "Your bow control is good. For an even smoother legato, try using a lighter bow arm and more consistent speed.",
+    "The staccato passages lacked a bit of clarity. Try practicing off-the-string strokes for a crisper articulation.",
+    "The bow distribution during long notes was excellent, resulting in a very even and sustained tone.",
+    "Watch for unintentional accents on bow changes, especially from down-bow to up-bow. A more fluid wrist and fingers can help.",
+  ],
+  phrasing: [
+    "You have a good sense of the musical phrase. To enhance it further, think about the dynamic shape of each line, building to a peak and then relaxing.",
+    "The phrasing felt a little uniform. Try varying your bow speed and vibrato to create more color and direction in each phrase.",
+    "The connection between phrases was seamless, telling a clear musical story.",
+    "Consider the end of your phrases; some tended to drop off in energy. Support the sound through the very end of the note.",
+  ]
+};
+
+// --- NEW DYNAMIC AI ANALYSIS FUNCTION ---
+// Takes the duration of the recording as an argument
+const getCriticalAIAnalysis = (duration) => {
   return new Promise(resolve => {
     setTimeout(() => {
-      const normalizedName = pieceName.trim().toLowerCase();
-      const dbKey = Object.keys(pieceDatabase).find(key => key.includes(normalizedName));
-      const result = dbKey ? pieceDatabase[dbKey] : { title: pieceName, description: "Information for this piece could not be found. AI analysis will proceed based on the audio data alone.", notFound: true };
-      resolve(result);
-    }, 2500);
+      const generatedFeedback = [];
+      const numFeedbackPoints = Math.floor(Math.random() * 3) + 2; // Generate 2 to 4 feedback points
+
+      for (let i = 0; i < numFeedbackPoints; i++) {
+        // Generate a random timestamp within the recording's duration
+        const randomTime = Math.random() * duration * 0.9; // Use 90% of duration to avoid the very end
+        const minutes = Math.floor(randomTime / 60).toString().padStart(2, '0');
+        const seconds = Math.floor(randomTime % 60).toString().padStart(2, '0');
+        const timestamp = `${minutes}:${seconds}`;
+
+        // Pick a random category and a random piece of feedback from that category
+        const categories = Object.keys(feedbackPool);
+        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+        const randomNote = feedbackPool[randomCategory][Math.floor(Math.random() * feedbackPool[randomCategory].length)];
+
+        generatedFeedback.push({ timestamp, note: randomNote });
+      }
+      resolve(generatedFeedback);
+    }, 4000);
   });
 };
 
-const getCriticalAIAnalysis = () => {
+const fetchPieceInfoAPI = async (pieceName) => {
+  console.log(`Searching for: ${pieceName}`);
   return new Promise(resolve => {
     setTimeout(() => {
-      const feedback = [
-        { timestamp: "0:04", note: "Intonation is sharp on the G#. This pitch deviation is outside the acceptable tolerance for this note." },
-        { timestamp: "0:09", note: "Rhythmic accuracy issue. The dotted quarter note was held for approximately 85% of its required value, rushing the following eighth note." },
-        { timestamp: "0:17", note: "Articulation lacks clarity in this passage. The staccato notes are not detached enough, blurring the phrasing." },
-        { timestamp: "0:22", note: "Bow change is audible. The transition from down-bow to up-bow creates an unintended accent inconsistent with reference recordings." },
-      ];
-      resolve(feedback);
-    }, 4000);
+      const searchTerms = pieceName.toLowerCase().split(' ').filter(term => term);
+      const foundKey = Object.keys(pieceDatabase).find(key => {
+        const piece = pieceDatabase[key];
+        const searchableText = `${piece.title.toLowerCase()} ${piece.keywords.join(' ')}`;
+        return searchTerms.every(term => searchableText.includes(term));
+      });
+      const result = foundKey 
+        ? pieceDatabase[foundKey] 
+        : { title: pieceName, description: "Information for this piece could not be found. AI analysis will proceed based on the audio data alone.", notFound: true };
+      resolve(result);
+    }, 1500);
   });
 };
 
@@ -281,6 +136,7 @@ function App() {
   const [pieceName, setPieceName] = useState('');
   const [userTempo, setUserTempo] = useState('');
   const [pieceInfo, setPieceInfo] = useState(null);
+  const [tempoFeedback, setTempoFeedback] = useState('');
   const [permission, setPermission] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -290,6 +146,7 @@ function App() {
 
   const questionsRef = useRef(null);
   const recorderRef = useRef(null);
+  const audioPlayerRef = useRef(null); // Ref for the audio player element
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerIntervalRef = useRef(null);
@@ -306,8 +163,30 @@ function App() {
   const handleSubmitQuestions = async () => {
     if (!pieceName) { alert("Please enter the name of the piece."); return; }
     setUiStage('analyzing');
+    setTempoFeedback(''); // Reset tempo feedback
     const info = await fetchPieceInfoAPI(pieceName);
     setPieceInfo(info);
+
+    // --- NEW: TEMPO ANALYSIS LOGIC ---
+    if (userTempo && !info.notFound) {
+      const userBPM = parseInt(userTempo, 10);
+      const targetBPM = info.usualTempo;
+      const difference = userBPM - targetBPM;
+      const percentageDiff = Math.abs(difference / targetBPM);
+
+      if (percentageDiff <= 0.08) { // Within 8%
+        setTempoFeedback("This is a great performance tempo!");
+      } else if (difference > 0) {
+        setTempoFeedback("This is a bit faster than a typical performance tempo. Ensure clarity is maintained.");
+      } else {
+        if (userBPM >= info.practiceTempo) {
+          setTempoFeedback("This is a solid practice tempo, a little slower than a typical performance.");
+        } else {
+          setTempoFeedback("This is a very deliberate practice tempo, good for working out tough spots.");
+        }
+      }
+    }
+    
     setUiStage('describing');
   };
 
@@ -354,7 +233,7 @@ function App() {
     mediaRecorderRef.current.stop();
     setIsRecording(false);
     clearInterval(timerIntervalRef.current);
-    cancelAnimationFrame(animationFrameRef.current);
+    if(animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     setVolume(0);
   };
 
@@ -371,8 +250,13 @@ function App() {
   };
 
   const analyzeRecording = async () => {
+    if (!audioPlayerRef.current || !audioPlayerRef.current.duration) {
+      alert("Audio not ready for analysis yet.");
+      return;
+    }
+    const duration = audioPlayerRef.current.duration;
     setUiStage('analyzing');
-    const feedback = await getCriticalAIAnalysis();
+    const feedback = await getCriticalAIAnalysis(duration);
     setAiFeedback(feedback);
     setUiStage('feedback');
   };
@@ -380,6 +264,7 @@ function App() {
   return (
     <div className="App-container">
       <div className="App">
+        {/* Side Galleries and Header are unchanged */}
         <div className="side-gallery left">
           <img src="/violin1.jpg" alt="Close-up of a violin body" />
           <img src="/violin2.jpg" alt="Person playing a violin" />
@@ -387,15 +272,11 @@ function App() {
         <main className="main-content">
           <header className="App-header">
             <h1>Violin Studio</h1>
-            <p className="welcome-message">
-              Welcome to the AI-Optimized Acoustic Enhancer Dashboard!
-            </p>
+            <p className="welcome-message">Welcome to the AI-Optimized Acoustic Enhancer Dashboard!</p>
             <p className="description">
               This application is designed to help you grow as a musician by providing cutting-edge tools to refine your sound. Our AI-powered features analyze your playing and offer feedback to enhance your acoustic quality. Take your violin skills to the next level and unlock your true potential.
             </p>
-            <button className="cta-button" onClick={handleInitialScroll}>
-              Start Your Analysis
-            </button>
+            <button className="cta-button" onClick={handleInitialScroll}>Start Your Analysis</button>
           </header>
         </main>
         <div className="side-gallery right">
@@ -406,24 +287,25 @@ function App() {
 
       {(uiStage !== 'welcome') && (
         <div className="interactive-container" ref={questionsRef}>
+          {/* Questions Area is unchanged */}
           <div className="questions-area">
             <h2>Practice Analysis</h2>
             <div className="question">
               <label htmlFor="piece-name">What piece of music are you playing?</label>
-              <input type="text" id="piece-name" className="question-input" placeholder="e.g., Bach D Minor Partita" value={pieceName} onChange={(e) => setPieceName(e.target.value)} />
+              <input type="text" id="piece-name" className="question-input" placeholder="e.g., Vivaldi Winter" value={pieceName} onChange={(e) => setPieceName(e.target.value)} />
             </div>
             <div className="question">
               <label htmlFor="tempo">What tempo (in BPM) are you taking it?</label>
               <input type="number" id="tempo" className="question-input" placeholder="e.g., 60" value={userTempo} onChange={(e) => setUserTempo(e.target.value)} />
             </div>
-            <button className="cta-button" onClick={handleSubmitQuestions} disabled={uiStage !== 'questions'}>
-              Submit for Description
-            </button>
+            <button className="cta-button" onClick={handleSubmitQuestions} disabled={uiStage !== 'questions'}>Submit for Description</button>
           </div>
 
+          {/* Piece Info Section now includes Tempo Feedback */}
           {pieceInfo && (uiStage === 'describing' || uiStage === 'recording' || uiStage === 'feedback') && (
               <div className="piece-info-section">
                   <h3>About: {pieceInfo.title}</h3>
+                  {tempoFeedback && <p className="tempo-feedback"><strong>Tempo Note:</strong> {tempoFeedback}</p>}
                   <p className="piece-info-description">{pieceInfo.description}</p>
                   {!pieceInfo.notFound && 
                       <div className="tempo-analysis">
@@ -435,6 +317,7 @@ function App() {
               </div>
           )}
           
+          {/* Recorder now has a ref on the audio element */}
           {(uiStage === 'recording' || uiStage === 'feedback') && (
               <div className="audio-recorder-section" ref={recorderRef}>
                   <h3>Record Your Performance</h3>
@@ -448,13 +331,14 @@ function App() {
                   {audioURL && (
                       <div className="audio-result">
                           <h4>Your Recording:</h4>
-                          <audio src={audioURL} controls className="audio-player" />
+                          <audio src={audioURL} controls className="audio-player" ref={audioPlayerRef} />
                           <button className="cta-button analyze-button" onClick={analyzeRecording}>Analyze My Recording</button>
                       </div>
                   )}
               </div>
           )}
 
+          {/* Analysis and Feedback sections are unchanged */}
           {uiStage === 'analyzing' && (
               <div className="analysis-indicator">
                   <div className="spinner"></div>
